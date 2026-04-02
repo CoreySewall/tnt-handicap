@@ -1,0 +1,257 @@
+@page "/"
+
+<PageTitle>TnT Handicap</PageTitle>
+
+<div class="tnt-wrap">
+    <h2 class="tnt-title">TnT Handicap Calculator</h2>
+
+    <!-- ── Inputs ─────────────────────────────────────────────────────── -->
+    <div class="panel">
+        <div class="input-grid">
+            <div class="field">
+                <label class="field-label">Player A &mdash; GHIN Index</label>
+                <input class="tnt-input" type="number" step="0.1" @bind="IndexAText" placeholder="e.g. 8.2" />
+            </div>
+            <div class="field">
+                <label class="field-label">Player B &mdash; GHIN Index</label>
+                <input class="tnt-input" type="number" step="0.1" @bind="IndexBText" placeholder="e.g. 14.5" />
+            </div>
+            <div class="field">
+                <label class="field-label">Player A Allowance %</label>
+                <input class="tnt-input" type="number" step="1" @bind="PctAText" placeholder="e.g. 35" />
+            </div>
+            <div class="field">
+                <label class="field-label">Player B Allowance %</label>
+                <input class="tnt-input" type="number" step="1" @bind="PctBText" placeholder="e.g. 15" />
+            </div>
+        </div>
+
+        <div class="radio-row">
+            <span class="radio-label-prefix">Holes:</span>
+            <label class="radio-opt">
+                <input type="radio" name="holes" checked="@(!IsEighteen)" @onchange="@(() => IsEighteen = false)" />
+                9-hole
+            </label>
+            <label class="radio-opt">
+                <input type="radio" name="holes" checked="@IsEighteen" @onchange="@(() => IsEighteen = true)" />
+                18-hole
+            </label>
+        </div>
+        @if (!IsEighteen)
+        {
+            <div class="radio-row">
+                <span class="radio-label-prefix">Nine played:</span>
+                <label class="radio-opt">
+                    <input type="radio" name="nine" checked="@IsFront" @onchange="@(() => IsFront = true)" />
+                    Front 9
+                </label>
+                <label class="radio-opt">
+                    <input type="radio" name="nine" checked="@(!IsFront)" @onchange="@(() => IsFront = false)" />
+                    Back 9
+                </label>
+            </div>
+        }
+
+        @if (ErrorMsg is not null)
+        {
+            <div class="error-msg">@ErrorMsg</div>
+        }
+
+        <button class="calc-btn" @onclick="Calculate">Calculate</button>
+    </div>
+
+    @if (Calculated)
+    {
+        <!-- ── Formula ─────────────────────────────────────────────────── -->
+        <div class="section-label">Formula (@HoleLabel)</div>
+        <div class="panel">
+            <div class="mono fg-muted fst-italic">@FormulaTemplate</div>
+            <div class="mono mt-sm fg-header fw-bold">Player A:</div>
+            <div class="mono fg-team">&nbsp;&nbsp;CH_A  =  @FormulaIndexA  &times;  (Slope &divide; 113)  +  (CR &minus; @CrConst)</div>
+            <div class="mono mt-sm fg-header fw-bold">Player B:</div>
+            <div class="mono fg-team">&nbsp;&nbsp;CH_B  =  @FormulaIndexB  &times;  (Slope &divide; 113)  +  (CR &minus; @CrConst)</div>
+            <div class="mono mt-sm fg-header fw-bold">Team Handicap:</div>
+            <div class="mono fg-cell">&nbsp;&nbsp;Team  =  Rounded(CH_A &times; @($"{PctA:F0}")%  +  CH_B &times; @($"{PctB:F0}")%)</div>
+        </div>
+
+        <!-- ── Player CH table ─────────────────────────────────────────── -->
+        <div class="section-label">Player course handicaps (@HoleLabel)</div>
+        <div class="panel scroll-x">
+            <table class="tnt-table">
+                <thead>
+                    <tr>
+                        <th class="th-left fg-header">Tee</th>
+                        <th class="fg-header">Rating</th>
+                        <th class="fg-header">Slope</th>
+                        <th class="fg-header">A(idx @($"{IndexA:F1}")) CH x @($"{PctA:F0}")%</th>
+                        <th class="fg-header">B(idx @($"{IndexB:F1}")) CH x @($"{PctB:F0}")%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < N; i++)
+                    {
+                        var row = i;
+                        <tr class="@(row % 2 == 1 ? "alt-row" : "")">
+                            <td class="td-left fg-cell">@TeeName[row]</td>
+                            <td class="fg-muted">@ActiveCR[row].ToString("F1")</td>
+                            <td class="fg-muted">@ActiveSlope[row]</td>
+                            <td class="fg-team">@ChA[row].ToString("F3")&nbsp;&nbsp;(@((ChA[row] * PctA / 100.0).ToString("F2")))</td>
+                            <td class="fg-team">@ChB[row].ToString("F3")&nbsp;&nbsp;(@((ChB[row] * PctB / 100.0).ToString("F2")))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ── Team matrix ─────────────────────────────────────────────── -->
+        <div class="section-label">@HoleLabel team handicap matrix &nbsp;(rows = A tee &middot; cols = B tee)</div>
+        <div class="panel scroll-x">
+            <table class="tnt-table matrix-table">
+                <thead>
+                    <tr>
+                        <th class="th-left fg-header">A \ B</th>
+                        @for (int c = 0; c < N; c++)
+                        {
+                            var col = c;
+                            <th class="fg-header">@TeeNameShort[col]</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int a = 0; a < N; a++)
+                    {
+                        var rowA = a;
+                        <tr class="@(rowA % 2 == 1 ? "alt-row" : "")">
+                            <td class="td-left fg-cell fw-bold">@TeeNameShort[rowA]</td>
+                            @for (int b = 0; b < N; b++)
+                            {
+                                var colB = b;
+                                <td class="fg-team fw-bold">@TeamRounded[rowA, colB]</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+    // ── Course data ──────────────────────────────────────────────────────
+    private static readonly string[] TeeName =
+    {
+        "Black", "Black/Gold", "Gold", "Gold/Blue",
+        "Blue", "Blue/White", "White", "White/Green",
+        "Green", "Green/Orange", "Orange"
+    };
+
+    private static readonly string[] TeeNameShort =
+    {
+        "Black", "B/Gold", "Gold", "G/Blue",
+        "Blue", "B/White", "White", "W/Green",
+        "Green", "G/Org", "Orange"
+    };
+
+    private static readonly double[] CR =
+        { 74.5, 73.4, 72.2, 70.8, 69.9, 68.9, 67.5, 65.6, 64.5, 61.9, 61.0 };
+    private static readonly int[] Slope =
+        { 142, 137, 136, 135, 128, 124, 122, 114, 108, 100, 97 };
+
+    private static readonly double[] CR_Front9 =
+        { 37.4, 36.7, 36.2, 35.6, 35.0, 34.7, 33.9, 33.0, 32.4, 31.1, 30.7 };
+    private static readonly int[] Slope_Front9 =
+        { 139, 132, 132, 130, 126, 126, 122, 112, 105, 97, 94 };
+
+    private static readonly double[] CR_Back9 =
+        { 37.1, 36.7, 36.0, 35.2, 34.9, 34.2, 33.6, 32.6, 32.1, 30.8, 30.3 };
+    private static readonly int[] Slope_Back9 =
+        { 144, 142, 140, 139, 129, 121, 121, 115, 110, 102, 100 };
+
+    private const int N = 11;
+
+    // ── Form state ───────────────────────────────────────────────────────
+    private string IndexAText = "";
+    private string IndexBText = "";
+    private string PctAText   = "35";
+    private string PctBText   = "15";
+    private bool   IsEighteen = false;
+    private bool   IsFront    = true;
+    private string? ErrorMsg  = null;
+    private bool   Calculated = false;
+
+    // ── Computed results ─────────────────────────────────────────────────
+    private double   IndexA, IndexB, PctA, PctB;
+    private double[] ChA         = new double[N];
+    private double[] ChB         = new double[N];
+    private int[,]   TeamRounded = new int[N, N];
+    private double[] ActiveCR    = CR;
+    private int[]    ActiveSlope = Slope;
+    private string   HoleLabel         = "";
+    private string   FormulaTemplate   = "";
+    private string   FormulaIndexA     = "";
+    private string   FormulaIndexB     = "";
+    private string   CrConst           = "72";
+
+    private static double CalcCH(double index, double cr, int slope, bool nineHole)
+    {
+        if (nineHole)
+            return (index / 2.0) * (slope / 113.0) + (cr - 36.0);
+        return index * (slope / 113.0) + (cr - 72.0);
+    }
+
+    private void Calculate()
+    {
+        ErrorMsg   = null;
+        Calculated = false;
+
+        if (!double.TryParse(IndexAText, out IndexA) || !double.TryParse(IndexBText, out IndexB))
+        {
+            ErrorMsg = "Please enter valid GHIN Index values for both players.";
+            return;
+        }
+        if (!double.TryParse(PctAText, out PctA) || !double.TryParse(PctBText, out PctB))
+        {
+            ErrorMsg = "Please enter valid allowance percentages.";
+            return;
+        }
+
+        if (IndexA > IndexB)
+        {
+            ErrorMsg = "Player A index must be lower than or equal to Player B index.";
+            return;
+        }
+
+        bool nineHole = !IsEighteen;
+        if (nineHole)
+        {
+            ActiveCR    = IsFront ? CR_Front9    : CR_Back9;
+            ActiveSlope = IsFront ? Slope_Front9 : Slope_Back9;
+            HoleLabel   = IsFront ? "Front 9"    : "Back 9";
+        }
+        else
+        {
+            ActiveCR    = CR;
+            ActiveSlope = Slope;
+            HoleLabel   = "18-hole";
+        }
+
+        CrConst         = nineHole ? "36" : "72";
+        FormulaTemplate = nineHole
+            ? "CH  =  (Index \u00F7 2)  \u00D7  (Slope \u00F7 113)  +  (CR \u2212 36)"
+            : "CH  =  Index  \u00D7  (Slope \u00F7 113)  +  (CR \u2212 72)";
+        FormulaIndexA   = nineHole ? $"({IndexA:F1} \u00F7 2)" : $"{IndexA:F1}";
+        FormulaIndexB   = nineHole ? $"({IndexB:F1} \u00F7 2)" : $"{IndexB:F1}";
+
+        for (int i = 0; i < N; i++)
+        {
+            ChA[i] = CalcCH(IndexA, ActiveCR[i], ActiveSlope[i], nineHole);
+            ChB[i] = CalcCH(IndexB, ActiveCR[i], ActiveSlope[i], nineHole);
+        }
+
+        for (int a = 0; a < N; a++)
+        for (int b = 0; b < N; b++)
+            TeamRounded[a, b] = (int)Math.Round(ChA[a] * (PctA / 100.0) + ChB[b] * (PctB / 100.0));
+
+        Calculated = true;
+    }
+}

@@ -1,0 +1,243 @@
+/* ── Reset & base ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #1E1E2E;
+    color: white;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
+}
+
+.main-content {
+    padding-bottom: 32px;
+}
+
+/* ── Page wrapper ─────────────────────────────────────────────────────── */
+.tnt-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+.tnt-title {
+    color: #3A96DD;
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* ── Panel card ───────────────────────────────────────────────────────── */
+.panel {
+    background: #12122A;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+/* ── Section labels ───────────────────────────────────────────────────── */
+.section-label {
+    color: #3A96DD;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 16px 0 6px 0;
+}
+
+/* ── Input grid ───────────────────────────────────────────────────────── */
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 480px) {
+    .input-grid { grid-template-columns: 1fr; }
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.field-label {
+    color: #88AACC;
+    font-size: 12px;
+}
+
+.tnt-input {
+    background: #2A2A3E;
+    border: 1px solid #3A3A5E;
+    border-radius: 4px;
+    color: white;
+    padding: 8px 10px;
+    font-size: 15px;
+    width: 100%;
+}
+
+.tnt-input:focus {
+    outline: none;
+    border-color: #3A96DD;
+}
+
+/* ── Radio buttons ────────────────────────────────────────────────────── */
+.radio-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.radio-opt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: white;
+    user-select: none;
+}
+
+.radio-opt input[type=radio] {
+    accent-color: #3A96DD;
+    width: 16px;
+    height: 16px;
+}
+
+.radio-sep { color: #3A3A5E; }
+
+.radio-label-prefix {
+    color: #AADDFF;
+    font-weight: bold;
+    font-size: 13px;
+    margin-right: 4px;
+}
+
+/* ── Error & button ───────────────────────────────────────────────────── */
+.error-msg {
+    color: #FF6B6B;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.calc-btn {
+    background: #3A96DD;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 0;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+}
+
+.calc-btn:hover  { background: #4AAAE8; }
+.calc-btn:active { background: #2A86CD; }
+
+/* ── Tables ───────────────────────────────────────────────────────────── */
+.scroll-x { overflow-x: auto; }
+
+.tnt-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.tnt-table th,
+.tnt-table td {
+    padding: 5px 10px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.tnt-table .th-left,
+.tnt-table .td-left { text-align: left; }
+
+.alt-row { background: rgba(255,255,255,0.07); }
+
+.matrix-table th,
+.matrix-table td {
+    min-width: 46px;
+    padding: 4px 6px;
+    font-size: 11px;
+}
+
+/* ── Formula ──────────────────────────────────────────────────────────── */
+.mono {
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.mt-sm { margin-top: 6px; }
+
+/* ── Color classes ────────────────────────────────────────────────────── */
+.fg-header  { color: #3A96DD; }
+.fg-cell    { color: white; }
+.fg-team    { color: #7EF5A0; }
+.fg-muted   { color: #88AACC; }
+.fw-bold    { font-weight: bold; }
+.fst-italic { font-style: italic; }
+
+/* ── Blazor loading & error UI ────────────────────────────────────────── */
+#blazor-error-ui {
+    background: #3A1010;
+    color: #FFAAAA;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0,0,0,0.4);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+.loading-progress {
+    position: relative;
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    margin: 20vh auto 1rem auto;
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke: #2A2A3E;
+    stroke-width: 0.6rem;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+}
+
+.loading-progress circle:last-child {
+    stroke: #3A96DD;
+    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+    transition: stroke-dasharray 0.05s ease-in-out;
+}
+
+.loading-progress-text {
+    position: absolute;
+    text-align: center;
+    font-weight: bold;
+    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+    color: #88AACC;
+}
+
+.loading-progress-text:after {
+    content: var(--blazor-load-percentage-text, "Loading");
+}
