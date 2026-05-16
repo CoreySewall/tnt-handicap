@@ -1,13 +1,9 @@
 self.assetsManifest = {
-  "version": "LODnKub1",
+  "version": "fEIDI3ch",
   "assets": [
     {
       "hash": "sha256-JgbE3q0yo/iH/UW60rCJeXYiiqxDDEkveM1eumE+duI=",
       "url": "TntHandicap.styles.css"
-    },
-    {
-      "hash": "sha256-t3JnyptYpBuw/mDp5IVBSr/fDLGaOPA0VaJpJiLLsEY=",
-      "url": "_framework/Microsoft.AspNetCore.Components.1uh4a4c33e.wasm"
     },
     {
       "hash": "sha256-3QSSs1PU62jhVuJWjQw0YFX5kVXQikkYVHpKT8qpi7E=",
@@ -16,6 +12,10 @@ self.assetsManifest = {
     {
       "hash": "sha256-Hymk0fViavnVW/gMYu9JN650NQTS5P8zPntoNQH10Xw=",
       "url": "_framework/Microsoft.AspNetCore.Components.WebAssembly.d13yrm8kw4.wasm"
+    },
+    {
+      "hash": "sha256-6YmrLcntBDbk3fhsz5QDc1wTtEckB9qxOuQJHId10Dw=",
+      "url": "_framework/Microsoft.AspNetCore.Components.zlw0dd9np9.wasm"
     },
     {
       "hash": "sha256-XmI2e4usTUn8mjG/nUVaZbYCmaAS+ClB/WG24O4bc9k=",
@@ -102,8 +102,8 @@ self.assetsManifest = {
       "url": "_framework/System.Net.Primitives.8x3nzqo64g.wasm"
     },
     {
-      "hash": "sha256-qZGzfyD1c0D4NusNIr0U4WKb/RekBe/4yXtq88tYrb4=",
-      "url": "_framework/System.Private.CoreLib.fepz7v8dcu.wasm"
+      "hash": "sha256-sTCYZYFtqMFjVZRcsERxj24MvfdfBD4YBD0ZM7oWRlw=",
+      "url": "_framework/System.Private.CoreLib.9yu4fzyrna.wasm"
     },
     {
       "hash": "sha256-Q6UcwofXV/nnHp9iMtEaXIMt5wEs4+c2SOJc+96xThM=",
@@ -130,11 +130,11 @@ self.assetsManifest = {
       "url": "_framework/System.Text.RegularExpressions.gjrc7fe0iy.wasm"
     },
     {
-      "hash": "sha256-Er4dLetZfJp2rQNKH4GDbnmp+PWPRTCbjVA1iSASJVM=",
-      "url": "_framework/TntHandicap.6nlqmyvh8o.wasm"
+      "hash": "sha256-b6RVpqH0/B0iCbq2RGGI4GWbsk+7YmakkweBOZcY+ak=",
+      "url": "_framework/TntHandicap.v4olrbzsr9.wasm"
     },
     {
-      "hash": "sha256-ef7kQ3Wu4MzQ1eLdf+Uh7FBIcew/lvM9FPW4XKD2rgE=",
+      "hash": "sha256-tj+8uwl3CpO4XIQyEe0iytUmOBQwRfmYAYohPC82SWA=",
       "url": "_framework/blazor.boot.json"
     },
     {
@@ -170,7 +170,7 @@ self.assetsManifest = {
       "url": "_framework/icudt_no_CJK.lfu7j35m59.dat"
     },
     {
-      "hash": "sha256-V7hi0DiyZc4SxYCQUqVY/jmPv+SCot9lu0y/wOkYvac=",
+      "hash": "sha256-e6V+MvyiJOYfP3/+fH/e1zba9C9vmPswNwzlQr3iElk=",
       "url": "css/app.css"
     },
     {
