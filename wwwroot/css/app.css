@@ -154,6 +154,12 @@ html, body {
     margin-bottom: 12px;
 }
 
+.warn-msg {
+    color: #FFD166;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
 .calc-btn {
     background: #3A96DD;
     color: white;

@@ -36,6 +36,10 @@
                 <label class="field-label">Player B Allowance %</label>
                 <input class="tnt-input" type="number" step="1" @bind="PctBText" placeholder="e.g. 15" />
             </div>
+            <div class="field">
+                <label class="field-label">Allowed Player Difference (strokes)</label>
+                <input class="tnt-input" type="number" step="1" @bind="MaxDiffText" placeholder="e.g. 10" />
+            </div>
         </div>
 
         <div class="radio-row">
@@ -68,6 +72,10 @@
         {
             <div class="error-msg">@ErrorMsg</div>
         }
+        @if (WarnMsg is not null)
+        {
+            <div class="warn-msg">@WarnMsg</div>
+        }
 
         <button class="calc-btn" @onclick="Calculate">Calculate</button>
     </div>
@@ -96,7 +104,7 @@
                         <th class="fg-header">Rating</th>
                         <th class="fg-header">Slope</th>
                         <th class="fg-header">A(idx @($"{IndexA:F1}")) CH x @($"{PctA:F0}")%</th>
-                        <th class="fg-header">B(idx @($"{IndexB:F1}")) CH x @($"{PctB:F0}")%</th>
+                        <th class="fg-header">B(idx @($"{IndexBUsed:F1}")@(DiffExceeded ? $" cap" : "")) CH x @($"{PctB:F0}")%</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -190,11 +198,16 @@
     private bool   IsFront    = true;
     private bool   IsPlusA    = false;
     private bool   IsPlusB    = false;
+    private string MaxDiffText = "10";
     private string? ErrorMsg  = null;
+    private string? WarnMsg   = null;
     private bool   Calculated = false;
 
     // ── Computed results ─────────────────────────────────────────────────
     private double   IndexA, IndexB, PctA, PctB;
+    private double   IndexBUsed  = 0;
+    private bool     DiffExceeded = false;
+    private int      MaxDiff      = 10;
     private double[] ChA         = new double[N];
     private double[] ChB         = new double[N];
     private int[,]   TeamRounded = new int[N, N];
@@ -216,6 +229,7 @@
     private void Calculate()
     {
         ErrorMsg   = null;
+        WarnMsg    = null;
         Calculated = false;
 
         if (!double.TryParse(IndexAText, out IndexA) || !double.TryParse(IndexBText, out IndexB))
@@ -226,6 +240,11 @@
         if (!double.TryParse(PctAText, out PctA) || !double.TryParse(PctBText, out PctB))
         {
             ErrorMsg = "Please enter valid allowance percentages.";
+            return;
+        }
+        if (!int.TryParse(MaxDiffText, out MaxDiff) || MaxDiff < 1)
+        {
+            ErrorMsg = "Allowed player difference must be a whole number of at least 1.";
             return;
         }
 
@@ -250,6 +269,20 @@
         if (IsPlusA) IndexA = -IndexA;
         if (IsPlusB) IndexB = -IndexB;
 
+        double cappedB = IndexA + MaxDiff;
+        if (IndexB > cappedB)
+        {
+            DiffExceeded = true;
+            WarnMsg = $"Player B's index ({(IsPlusB ? "+" : "")}{Math.Abs(IndexB):F1}) exceeds the allowed {MaxDiff}-stroke difference from Player A. " +
+                      $"Player B's index has been capped to {cappedB:F1} for all calculations.";
+            IndexBUsed = cappedB;
+        }
+        else
+        {
+            DiffExceeded = false;
+            IndexBUsed   = IndexB;
+        }
+
         bool nineHole = !IsEighteen;
         if (nineHole)
         {
@@ -269,13 +302,12 @@
             ? "CH  =  (Index \u00F7 2)  \u00D7  (Slope \u00F7 113)  +  (CR \u2212 36)"
             : "CH  =  Index  \u00D7  (Slope \u00F7 113)  +  (CR \u2212 72)";
         FormulaIndexA   = nineHole ? $"({IndexA:F1} \u00F7 2)" : $"{IndexA:F1}";
-        FormulaIndexB   = nineHole ? $"({IndexB:F1} \u00F7 2)" : $"{IndexB:F1}";
-
+        FormulaIndexB   = nineHole ? $"({IndexBUsed:F1} \u00F7 2)" : $"{IndexBUsed:F1}";
 
         for (int i = 0; i < N; i++)
         {
             ChA[i] = CalcCH(IndexA, ActiveCR[i], ActiveSlope[i], nineHole);
-            ChB[i] = CalcCH(IndexB, ActiveCR[i], ActiveSlope[i], nineHole);
+            ChB[i] = CalcCH(IndexBUsed, ActiveCR[i], ActiveSlope[i], nineHole);
         }
 
         for (int a = 0; a < N; a++)
