@@ -10,11 +10,23 @@
         <div class="input-grid">
             <div class="field">
                 <label class="field-label">Player A &mdash; GHIN Index</label>
-                <input class="tnt-input" type="number" step="0.1" @bind="IndexAText" placeholder="e.g. 8.2" />
+                <div class="index-row">
+                    <input class="tnt-input" type="number" step="0.1" @bind="IndexAText" placeholder="e.g. 8.2" />
+                    <label class="plus-check">
+                        <input type="checkbox" @bind="IsPlusA" />
+                        +HCP
+                    </label>
+                </div>
             </div>
             <div class="field">
                 <label class="field-label">Player B &mdash; GHIN Index</label>
-                <input class="tnt-input" type="number" step="0.1" @bind="IndexBText" placeholder="e.g. 14.5" />
+                <div class="index-row">
+                    <input class="tnt-input" type="number" step="0.1" @bind="IndexBText" placeholder="e.g. 14.5" />
+                    <label class="plus-check">
+                        <input type="checkbox" @bind="IsPlusB" />
+                        +HCP
+                    </label>
+                </div>
             </div>
             <div class="field">
                 <label class="field-label">Player A Allowance %</label>
@@ -176,6 +188,8 @@
     private string PctBText   = "15";
     private bool   IsEighteen = false;
     private bool   IsFront    = true;
+    private bool   IsPlusA    = false;
+    private bool   IsPlusB    = false;
     private string? ErrorMsg  = null;
     private bool   Calculated = false;
 
@@ -215,11 +229,26 @@
             return;
         }
 
-        if (IndexA > IndexB)
+        if (IsPlusB && !IsPlusA)
         {
-            ErrorMsg = "Player A index must be lower than or equal to Player B index.";
+            ErrorMsg = "Player A must also be a + handicapper when Player B is — any + handicapper is a better player than a non-plus player.";
             return;
         }
+
+        if (IsPlusA && IsPlusB && IndexA < IndexB)
+        {
+            ErrorMsg = "When both players are + handicappers, Player A's index must be greater than or equal to Player B's (e.g. A = +5, B = +2).";
+            return;
+        }
+
+        if (!IsPlusA && !IsPlusB && IndexA > IndexB)
+        {
+            ErrorMsg = "Player A's index must be lower than or equal to Player B's — Player A is always the better player.";
+            return;
+        }
+
+        if (IsPlusA) IndexA = -IndexA;
+        if (IsPlusB) IndexB = -IndexB;
 
         bool nineHole = !IsEighteen;
         if (nineHole)
@@ -241,6 +270,7 @@
             : "CH  =  Index  \u00D7  (Slope \u00F7 113)  +  (CR \u2212 72)";
         FormulaIndexA   = nineHole ? $"({IndexA:F1} \u00F7 2)" : $"{IndexA:F1}";
         FormulaIndexB   = nineHole ? $"({IndexB:F1} \u00F7 2)" : $"{IndexB:F1}";
+
 
         for (int i = 0; i < N; i++)
         {

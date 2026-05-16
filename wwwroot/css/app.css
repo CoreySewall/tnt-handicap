@@ -84,6 +84,36 @@ html, body {
     border-color: #3A96DD;
 }
 
+/* ── Plus handicap row ────────────────────────────────────────────────── */
+.index-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.index-row .tnt-input {
+    flex: 1;
+}
+
+.plus-check {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #AADDFF;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.plus-check input[type=checkbox] {
+    accent-color: #3A96DD;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
 /* ── Radio buttons ────────────────────────────────────────────────────── */
 .radio-row {
     display: flex;
